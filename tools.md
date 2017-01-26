@@ -25,11 +25,11 @@ Jenkins is a fork from Hudson. Don't bother using Hudson.
 ### Travis
 *Cloud first, Self-Hosted. https://travis-ci.org, https://travis-ci.com*
 
-Travis is also very popular, as it's free to use with open-sourced projects and 
-integrates well with them on Github (but only github). Configuration is simple, 
-just edit a yaml file in the root of your project, and then enable that 
-repository on travis-ci.org. Travis builds in the free tier work good, but 
-large, slow-compiling codebases may want to pay for service or think of using 
+Travis is also very popular, as it's free to use with open-sourced projects and
+integrates well with them on Github (but only github). Configuration is simple,
+just edit a yaml file in the root of your project, and then enable that
+repository on travis-ci.org. Travis builds in the free tier work good, but
+large, slow-compiling codebases may want to pay for service or think of using
 Jenkins.
 
 Travis and Jenkins are often used in a complimentary fashion, with Travis
@@ -57,8 +57,11 @@ Travis, CircleCI works with a variety of code hosting platforms.
 *Self-Hosted, Cloud. https://circleci.com*
 
 Bamboo is an Atlassian product, and as such it can integrate will with their
-services, such as Jira. Good things are said about the UI, but it's not as 
+services, such as Jira. Good things are said about the UI, but it's not as
 flexible as Jenkins (but then again, nothing is).
+
+### Gitlab
+
 
 ### Others (TeamCity, Codeship)
 Good things are said about both of these, but they have small marketshare and
@@ -77,59 +80,144 @@ Buildbot is also used, though typically as a legacy system.
 # Build Tools
 
 In general, most of these tools are going to be language specific. Make is the
-grandpa in the room and very flexible. There's often overlap between CI and 
+grandpa in the room and very flexible. There's often overlap between CI and
 build tools, so that may be a consideration. There's also often overlap with
 devops tools, like Ansible, Chef, Puppet, and SaltStack.
 
 The list of build tools is large, but typically people use one or more of the
 following:
 
-* **Make** 
+* **Make**
 * **Maven** (Gradle, sbt, etc...),
 * **CMake**
 * **SCons**
 * **tox** (python)
 * **rake** (ruby)
 
-A few tools are more general, and not necessarily oriented around a specific 
+A few tools are more general, and not necessarily oriented around a specific
 language.
 * **Bazel, Buck, Pants** *(https://bazel.build, https://buckbuild.com/, http://www.pantsbuild.org/)*: These tools all have a common lineage that's
 traceable back to Google's Blaze build system. They are generally flexible and
 the build system is not specific to any given language.
 
-* **Waf** *(waf.io)*: With waf, you write your build scripts as python. In that
-sense, it's similar to SCons.
+* **Waf** *(http://waf.io)*: With waf, you write your build scripts as python.
+In that sense, it's similar to SCons.
 
 
 # Code Quality/Static Analysis
-Coverity, Sonarqube. Typically integrated with CI: PMD, FindBugs, CPPCheck, Clang Analyzer. Other: (CI Plugins, Language tools)
+There's several different types of checks you can execute to check your code's
+quality. You have static analyzers, which parse the code, look at variable
+assignments, build call graphs, and generally try to determine where possible
+bugs occur. The most prominent examples of these sorts of tools are Coverity,
+FindBugs, and Clang Static Analyzer. They find bugs in code that is obviously
+compilable, but potentially bad at runtime, like a dereferenced null pointer.
 
-Code Review
-Gerritt, GitHub, Crucible/Stash, Phabricator
+Next up, you have less more rules based code checkers that examine code and look
+for obvious and logical errors and/or code that is not compilable. These
+are usually faster but per-file. The static analyzer in a typical IDE is
+usually somewhere in between the first and second one.
 
-Artifact Repository and Package Management
-Artifactory, Nexus 3. Platform/Language Specific: Conda, PyPI, Archiva, Maven, Bower, yum/rpm, apt/deb
+Next, you have coverage checkers, which examine how well your code
+is covered by unit tests. Corbertura for Java is a popular example. The services
+typically have this integrated into them.
 
-Source Code Management
-Git, Perforce, Mercurial, Subversion. Platforms: GitHub, GitLab, BitBucket, Fisheye. Other: (Bazaar, CVS).
+Finally, you have linters, which check/enforce a coding style across your
+projects. This typically includes things like  pycodestyle, CheckStyle for Java,
+Clang Format, and JSLint. There's different levels of sophistication of tools.
+This section will not cover the tools which are built into an IDE, though those
+tools vary from linting to full static analysis in capability.
 
-IDEs/Text Editors
+
+### Coverity
+*Cloud, Self-Hosted, https://www.coverity.com/products/coverity-scan/*
+
+Coverity is an industry-standard static analysis tool. It's will check for bugs
+in the most popular languages.
+
+Coverity is really two products: Coverity scan (https://scan.coverity.com) is
+the free static checker for open-source projects, with checks done in the cloud.
+Coverity also has a paid solution which appears to be purchased either based
+on the size of the team or lines of code, depending. Coverity is good at
+checking for a wide variety of code defects.
+
+Coverity's free product has integration in with Github and Travis.
+
+
+### Sonarqube
+*Self-Hosted, https://www.sonarqube.org/*
+
+Sonarqube is really a platform for code quality checking. It  has very good
+integration into CI systems and code hosting platforms. One nice thing
+Sonarqube has is analytics on code quality over time. Sonarqube mostly operates
+as a reporting tool. It supports a variety of languages, including Java, C++,
+Python, PHP, C#, and more. Sonarqube uses some of the open source libraries
+underneath to perform the checks.
+
+Others:
+* **PMD, FindBugs**: Both of these are Java static analyzers. They are often
+compliment each other
+* **CPPCheck, Clang Analyzer**: These are similar to PMD and FindBugs.
+* **Flake8**: Uses PyFlakes and PEP8 to check code style and find logical
+errors, as well as check code complexity.
+* **Checkstyle**: Java linter
+
+# Code Review
+
+## Gerritt, GitHub, Crucible/Stash, Phabricator
+Github is the one most people are probably familiar with. Gerritt is also very
+common in use. Crucible and Stash are Atlassian products. Phabricator is a
+a few different things, but it also includes code review. Gerritt is probably
+the most powerful of these tools.
+
+
+# Artifact Repository and Package Management
+### Artifactory
+*(Self Hosted, https://www.jfrog.com/artifactory/)*
+
+
+### Nexus 3
+*(Self Hosted, http://www.sonatype.org/nexus/category/nexus-3/)*
+
+## Platform/Language Specific and Others
+Maven and Conda are sort of language specific. Archiva is a bit more
+supporting, but not by much.
+* **Maven**
+* **Conda**
+* **Archiva**
+* **PyPI**
+* **Bower**
+* **yum/rpm**
+* **apt/deb**
+
+### Resources
+[Binary Repository Manager Feature Matrix *(Date: 9-15-2016)](https://binary-repositories-comparison.github.io/)
+
+
+# Source Code Management
+
+### Git, Perforce, Subversion, Mercurial, Bazaar, CVS
+Most of these need no introduction. Perforce is probably an exception to that,
+because it has some unique features. In general, these are effectively in the
+order you shuold use them.
+
+
+ ## Platforms: GitHub, GitLab, BitBucket, Fisheye. Other: (Bazaar, CVS).
+
+
+# IDEs/Text Editors
 Visual Studio, Eclipse, Netbeans, JetBrains Suite (IntelliJ, PyCharm, CLion, etc..).  Other: (Sublime Text, Emacs, Vim, Atom, Notepad++)
 
-Project Management (Agile), Development Workflows, CCBs, Defects and Issues
+# Project Management (Agile), Development Workflows, CCBs, Defects and Issues
 Jira, GitHub/GitLab Issues, BugZilla, Trac. Other: (YouTrack, Team Foundation Server, VersionOne)
 
-Design, Modeling, and Concept Mapping
+# Design, Modeling, and Concept Mapping
 GenMyModel, Sparx, MagicDraw, Visio, Altova, Omnigraffle, Mindmup
 
-Debugging, Profiling, Monitoring:
+# Debugging, Profiling, Monitoring:
 gdb, Allinea, Vampir/VampirTrace, Valgrind, JVM tools. Other: (dtrace, strace, Language and Platform specific tools)
 
-Notes, Documentation, Technical Notes:
+# Notes, Documentation, Technical Notes:
 OneNote, Evernote, Jupyter Notebooks, Confluence. Other: (Read The Docs, Language-Specific tools)
 
-Configuration and Deployment
+# Configuration and Deployment
 SaltStack, Ansible, Chef, Puppet, Vagrant, Containers/Docker
-
-[1] For More, see: https://en.wikipedia.org/wiki/List_of_build_automation_software
-
